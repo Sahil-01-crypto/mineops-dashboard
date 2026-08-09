@@ -8,16 +8,17 @@ import Production from "./pages/Production.jsx";
 import Stock from "./pages/Stock.jsx";
 import Analytics from "./pages/Analytics.jsx";
 
-const App = () => {
+import { MineDataProvider } from "./context/MineDataContext.jsx";
 
+const App = () => {
   const [page, setPage] = useState("Dashboard");
 
   return (
-    <div className="flex">
+    <MineDataProvider>
 
       <Sidebar setPage={setPage} />
 
-     <div className="flex-1 ml-64 bg-[#0B1220] min-h-screen">
+      <div className="flex-1 ml-64 bg-[#0B1220] min-h-screen">
 
         <Navbar />
 
@@ -25,13 +26,13 @@ const App = () => {
 
         {page === "Production" && <Production />}
 
-        {page === "Stock" && <Stock/>}
+        {page === "Stock" && <Stock />}
 
-        {page === "Analytics" && <Analytics/>}
+        {page === "Analytics" && <Analytics />}
 
       </div>
 
-    </div>
+    </MineDataProvider>
   );
 };
 

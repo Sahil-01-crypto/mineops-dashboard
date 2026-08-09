@@ -1,20 +1,36 @@
-import { FaBell, FaMoon, FaSearch, FaUserCircle } from "react-icons/fa";
+import React, { useState } from "react";
+import {
+  FaBell,
+  FaMoon,
+  FaSearch,
+  FaUserCircle,
+} from "react-icons/fa";
+
+import { useMineData } from "../../context/MineDataContext.jsx";
 
 const Navbar = () => {
+  const { mineData } = useMineData();
+
+  const [search, setSearch] = useState("");
+
+  const searchResults =
+    search.trim() && mineData
+      ? mineData.filter((item) =>
+          Object.values(item).some((value) =>
+            String(value)
+              .toLowerCase()
+              .includes(search.toLowerCase())
+          )
+        )
+      : [];
+
   return (
-    <nav
-      className="
-        sticky top-0 z-50
-        h-20
-        bg-[#111827]
-        border-b border-[#1E293B]
-        flex items-center justify-between
-        px-8
-      "
-    >
+    <nav className="h-20 px-8 flex items-center justify-between">
+
       {/* Search Section */}
 
       <div className="relative w-[550px]">
+
         <FaSearch
           className="
             absolute
@@ -28,6 +44,8 @@ const Navbar = () => {
 
         <input
           type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
           placeholder="Search production, stock..."
           className="
             w-full
@@ -47,11 +65,106 @@ const Navbar = () => {
             focus:ring-blue-500/20
           "
         />
+
+        {/* Search Results */}
+
+        {search.trim() && (
+          <div
+            className="
+              absolute
+              top-14
+              left-0
+              w-full
+              bg-[#172236]
+              border border-[#2A3B57]
+              rounded-xl
+              shadow-xl
+              z-50
+              overflow-hidden
+            "
+          >
+
+            {searchResults.length > 0 ? (
+
+              <div className="max-h-80 overflow-y-auto">
+
+                {searchResults.map((item, index) => (
+
+                  <div
+                    key={index}
+                    className="
+                      px-5
+                      py-4
+                      border-b
+                      border-[#2A3B57]
+                      hover:bg-[#1B2A40]
+                      transition
+                    "
+                  >
+
+                    <div className="flex justify-between">
+
+                      <span className="text-white font-semibold">
+                        {item.Date || "Unknown Date"}
+                      </span>
+
+                      <span className="text-blue-400">
+                        {item.Production
+                          ? `${Number(item.Production).toLocaleString()} MT`
+                          : "No Production Data"}
+                      </span>
+
+                    </div>
+
+                    <div className="flex gap-5 mt-2 text-sm text-slate-400">
+
+                      <span>
+                        Target:{" "}
+                        {item.Target
+                          ? Number(item.Target).toLocaleString()
+                          : "—"}
+                      </span>
+
+                      <span>
+                        Dispatch:{" "}
+                        {item.Dispatch
+                          ? Number(item.Dispatch).toLocaleString()
+                          : "—"}
+                      </span>
+
+                      <span>
+                        Stock:{" "}
+                        {item.Stock
+                          ? Number(item.Stock).toLocaleString()
+                          : "—"}
+                      </span>
+
+                    </div>
+
+                  </div>
+
+                ))}
+
+              </div>
+
+            ) : (
+
+              <div className="px-5 py-6 text-center text-slate-400">
+                No matching records found.
+              </div>
+
+            )}
+
+          </div>
+        )}
+
       </div>
+
 
       {/* Right Section */}
 
       <div className="flex items-center gap-5">
+
         <button
           className="
             h-11 w-11
@@ -65,6 +178,7 @@ const Navbar = () => {
         >
           <FaMoon className="text-slate-300 text-lg" />
         </button>
+
 
         <button
           className="
@@ -81,7 +195,9 @@ const Navbar = () => {
           <FaBell className="text-slate-300 text-lg" />
 
           <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-orange-500"></span>
+
         </button>
+
 
         <button
           className="
@@ -95,7 +211,9 @@ const Navbar = () => {
         >
           <FaUserCircle className="text-white text-2xl" />
         </button>
+
       </div>
+
     </nav>
   );
 };
