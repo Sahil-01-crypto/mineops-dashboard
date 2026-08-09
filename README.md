@@ -258,35 +258,6 @@ The application calculates performance metrics from these values.
 
 ---
 
-## ⚙️ Getting Started
-
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/YOUR_USERNAME/mineops.git
-```
-
-### 2. Enter the project directory
-
-```bash
-cd mineops
-```
-
-### 3. Install dependencies
-
-```bash
-npm install
-```
-
-### 4. Start the development server
-
-```bash
-npm run dev
-```
-
-The application will then be available through the local Vite development server.
-
----
 
 ## 🔄 Application Workflow
 
@@ -342,48 +313,6 @@ The current version focuses on:
 - Search
 - PDF reporting
 
----
-
-## 🔮 Future Improvements
-
-MineOps V1 currently focuses on client-side data analysis.
-
-Future versions could introduce:
-
-- Backend API
-- PostgreSQL / database integration
-- User authentication
-- Role-based access
-- Multiple mine management
-- Real-time operational data
-- Equipment monitoring
-- Automated alerts
-- Low-stock notifications
-- Historical data storage
-- Cloud deployment
-- Real mine data/API integration
-- Advanced predictive analytics
-- Production forecasting
-
-### Possible V2 Architecture
-
-```text
-                    Frontend
-                       │
-                       ▼
-                  REST API
-                       │
-                       ▼
-                   Backend
-                       │
-              ┌────────┴────────┐
-              ▼                 ▼
-          PostgreSQL       Data Processing
-              │                 │
-              └────────┬────────┘
-                       ▼
-                Mine Operations
-```
 
 ---
 
@@ -397,7 +326,7 @@ MineOps can evolve from a client-side analytics dashboard into a complete mining
 
 **Sahil Kumar Singh**
 
-Built as a project exploring frontend development, data visualization, and operational analytics for mining applications.
+Built as a project exploring  development, data visualization, and operational analytics for mining applications.
 
 ---
 
