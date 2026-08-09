@@ -1,16 +1,238 @@
-# React + Vite
+# ⛏️ MineOps
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+### Mining Operations Intelligence Dashboard
 
-Currently, two official plugins are available:
+MineOps is a web-based mining operations analytics platform that transforms operational data from Excel/CSV files into an interactive dashboard for monitoring production, stock, efficiency, and operational performance.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+The application allows users to upload operational data once and automatically analyzes the dataset across multiple sections including Dashboard, Production, Stock, and Analytics.
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🚀 Features
 
-## Expanding the ESLint configuration
+### 📊 Interactive Dashboard
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Get a high-level overview of mining operations including:
+
+- Today's Production
+- Today's Dispatch
+- Available Stock
+- Active Equipment
+- Production Trend
+- Daily Operational Summary
+
+All dashboard metrics are generated from the uploaded operational dataset.
+
+---
+
+### 📁 Excel / CSV Data Upload
+
+MineOps allows users to upload operational data directly through the application.
+
+The uploaded dataset is processed and stored centrally so that all sections of the application can use the same data.
+
+```text
+Excel / CSV
+     ↓
+Data Processing
+     ↓
+MineDataContext
+     ↓
+Dashboard
+Production
+Stock
+Analytics
+
+### 🏭 Production Monitoring
+
+The Production section provides:
+
+- Total production
+- Average daily production
+- Production efficiency
+- Daily production table
+- Target vs actual production
+- Daily performance analysis
+
+Production metrics are calculated dynamically from the uploaded dataset.
+
+### 📦 Stock Monitoring
+
+The Stock section provides:
+
+- Current stock
+- Highest recorded stock
+- Average stock
+- Stock history
+- Daily stock changes
+- Stock increase/decrease status
+
+Stock metrics are calculated dynamically from the uploaded dataset.
+
+### 📈 Analytics
+
+The Analytics section provides:
+
+- Average production
+- Average efficiency
+- Best production day
+- Lowest production day
+- Production vs target visualization
+- Efficiency trend
+- Target achievement
+- Operational insights
+
+All analytics are generated dynamically from the uploaded operational dataset.
+
+### 📄 PDF Report Generation
+
+MineOps can generate a downloadable operational report containing:
+
+- Executive summary
+- Total production
+- Average daily production
+- Average efficiency
+- Current stock
+- Target achievement
+- Best production day
+- Lowest production day
+- Daily production table
+- Stock history
+
+## 🧠 Architecture
+
+MineOps follows a centralized data architecture.
+
+Instead of each page maintaining its own copy of the uploaded data, the application uses React Context to maintain a shared dataset.
+
+```text
+                    Excel / CSV
+                         │
+                         ▼
+                  ExcelUploader
+                         │
+                         ▼
+                MineDataContext
+                         │
+          ┌──────────────┼──────────────┐
+          │              │              │
+          ▼              ▼              ▼
+      Dashboard      Production       Stock
+          │              │              │
+          └──────────────┼──────────────┘
+                         ▼
+                     Analytics
+                         │
+                         ▼
+                    PDF Report
+
+## 🛠️ Tech Stack
+
+### Frontend
+
+- React
+- JavaScript
+- Tailwind CSS
+- Recharts
+- React Icons
+
+### Data Processing
+
+- XLSX
+
+### Reporting
+
+- jsPDF
+- jsPDF AutoTable
+
+### Development & Version Control
+
+- Vite
+- Git
+- GitHub
+
+## 📂 Project Structure
+
+```text
+src/
+│
+├── components/
+│   ├── dashboard/
+│   │   ├── KPICard.jsx
+│   │   ├── productionChart.jsx
+│   │   └── OperationsSummary.jsx
+│   │
+│   ├── data/
+│   │   └── ExcelUploader.jsx
+│   │
+│   ├── layout/
+│   │   ├── Navbar.jsx
+│   │   └── Sidebar.jsx
+│   │
+│   └── reports/
+│       └── PDFReportGenerator.jsx
+│
+├── context/
+│   └── MineDataContext.jsx
+│
+├── pages/
+│   ├── Dashboard.jsx
+│   ├── Production.jsx
+│   ├── Stock.jsx
+│   └── Analytics.jsx
+│
+├── data/
+│
+├── App.jsx
+└── main.jsx
+
+## 📋 Expected Data Format
+
+MineOps works with operational datasets containing fields such as:
+
+| Field | Description |
+|---|---|
+| Date | Operational date |
+| Production | Daily production in MT |
+| Target | Daily production target |
+| Dispatch | Daily dispatch quantity |
+| Stock | Available stock in MT |
+
+### Example
+
+| Date | Production | Target | Dispatch | Stock |
+|---|---:|---:|---:|---:|
+| Monday | 11200 | 12000 | 10500 | 48000 |
+| Tuesday | 12450 | 12000 | 10920 | 48650 |
+| Wednesday | 11800 | 12500 | 10700 | 47500 |
+| Thursday | 13200 | 12500 | 11500 | 49200 |
+
+The application calculates performance metrics from these values.
+
+## 🎯 Project Goals
+
+MineOps was designed to demonstrate how operational datasets can be transformed into a usable decision-support interface.
+
+The primary goals are:
+
+- Centralized operational data handling
+- Automated metric calculation
+- Interactive data visualization
+- Production monitoring
+- Stock monitoring
+- Operational performance analysis
+- Automated report generation
+
+## ⭐ Future Vision
+
+MineOps can evolve from a client-side analytics dashboard into a complete mining operations intelligence platform with real-time data, backend services, persistent storage, alerts, authentication, and predictive analytics.
+
+## 👨‍💻 Author
+
+**Sahil Kumar Singh**
+
+Built as a project exploring frontend development, data visualization, and operational analytics for mining applications.
+
+## 📜 License
+
+This project is intended for learning, experimentation, and portfolio purposes.
