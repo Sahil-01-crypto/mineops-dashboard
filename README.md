@@ -42,3 +42,16 @@ Dashboard
 Production
 Stock
 Analytics
+```
+🏭 Production Monitoring
+
+The Production section provides:
+
+Total production
+Average daily production
+Production efficiency
+Daily production table
+Target vs actual production
+Daily performance analysis
+
+Production metrics are calculated dynamically from the uploaded dataset.
