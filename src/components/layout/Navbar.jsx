@@ -1,10 +1,5 @@
 import React, { useState } from "react";
-import {
-  FaBell,
-  FaMoon,
-  FaSearch,
-  FaUserCircle,
-} from "react-icons/fa";
+import { FaBell, FaMoon, FaSearch, FaUserCircle } from "react-icons/fa";
 
 import { useMineData } from "../../context/MineDataContext.jsx";
 
@@ -17,20 +12,16 @@ const Navbar = () => {
     search.trim() && mineData
       ? mineData.filter((item) =>
           Object.values(item).some((value) =>
-            String(value)
-              .toLowerCase()
-              .includes(search.toLowerCase())
-          )
+            String(value).toLowerCase().includes(search.toLowerCase()),
+          ),
         )
       : [];
 
   return (
     <nav className="h-20 px-8 flex items-center justify-between">
-
       {/* Search Section */}
 
       <div className="relative w-[550px]">
-
         <FaSearch
           className="
             absolute
@@ -83,13 +74,9 @@ const Navbar = () => {
               overflow-hidden
             "
           >
-
             {searchResults.length > 0 ? (
-
               <div className="max-h-80 overflow-y-auto">
-
                 {searchResults.map((item, index) => (
-
                   <div
                     key={index}
                     className="
@@ -101,9 +88,7 @@ const Navbar = () => {
                       transition
                     "
                   >
-
                     <div className="flex justify-between">
-
                       <span className="text-white font-semibold">
                         {item.Date || "Unknown Date"}
                       </span>
@@ -113,11 +98,9 @@ const Navbar = () => {
                           ? `${Number(item.Production).toLocaleString()} MT`
                           : "No Production Data"}
                       </span>
-
                     </div>
 
                     <div className="flex gap-5 mt-2 text-sm text-slate-400">
-
                       <span>
                         Target:{" "}
                         {item.Target
@@ -134,86 +117,20 @@ const Navbar = () => {
 
                       <span>
                         Stock:{" "}
-                        {item.Stock
-                          ? Number(item.Stock).toLocaleString()
-                          : "—"}
+                        {item.Stock ? Number(item.Stock).toLocaleString() : "—"}
                       </span>
-
                     </div>
-
                   </div>
-
                 ))}
-
               </div>
-
             ) : (
-
               <div className="px-5 py-6 text-center text-slate-400">
                 No matching records found.
               </div>
-
             )}
-
           </div>
         )}
-
       </div>
-
-
-      {/* Right Section */}
-
-      <div className="flex items-center gap-5">
-
-        <button
-          className="
-            h-11 w-11
-            rounded-xl
-            bg-[#182235]
-            border border-[#2A3A55]
-            flex items-center justify-center
-            hover:bg-[#22304a]
-            transition
-          "
-        >
-          <FaMoon className="text-slate-300 text-lg" />
-        </button>
-
-
-        <button
-          className="
-            relative
-            h-11 w-11
-            rounded-xl
-            bg-[#182235]
-            border border-[#2A3A55]
-            flex items-center justify-center
-            hover:bg-[#22304a]
-            transition
-          "
-        >
-          <FaBell className="text-slate-300 text-lg" />
-
-          <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-orange-500"></span>
-
-        </button>
-
-
-        <button
-          className="
-            h-11 w-11
-            rounded-full
-            bg-blue-600
-            flex items-center justify-center
-            hover:bg-blue-500
-            transition
-          "
-        >
-          <FaUserCircle className="text-white text-2xl" />
-        </button>
-
-      </div>
-
     </nav>
   );
 };
