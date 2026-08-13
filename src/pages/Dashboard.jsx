@@ -14,50 +14,50 @@ const Dashboard = () => {
   const latestData = mineData?.[mineData.length - 1];
 
   const kpiData = latestData
-    ? [
-        {
-          title: "Today's Production",
-          value: Number(latestData.Production).toLocaleString(),
-          unit: "MT",
-        },
-        {
-          title: "Today's Dispatch",
-          value: Number(latestData.Dispatch).toLocaleString(),
-          unit: "MT",
-        },
-        {
-          title: "Available Stock",
-          value: Number(latestData.Stock).toLocaleString(),
-          unit: "MT",
-        },
-        {
-          title: "Active Equipment",
-          value: latestData.ActiveEquipment,
-          unit: "",
-        },
-      ]
-    : [
-        {
-          title: "Today's Production",
-          value: "No Data Uploaded",
-          unit: "",
-        },
-        {
-          title: "Today's Dispatch",
-          value: "No Data Uploaded",
-          unit: "",
-        },
-        {
-          title: "Available Stock",
-          value: "No Data Uploaded",
-          unit: "",
-        },
-        {
-          title: "Active Equipment",
-          value: "No Data Uploded",
-          unit: "",
-        },
-      ];
+  ? [
+      {
+        title: "Fine Ore Production",
+        value: latestData.fineOreProduction.toLocaleString(),
+        unit: "MT",
+      },
+      {
+        title: "Lump Ore Production",
+        value: latestData.lumpOreProduction.toLocaleString(),
+        unit: "MT",
+      },
+      {
+        title: "Overall Production",
+        value: latestData.overallProduction.toLocaleString(),
+        unit: "MT",
+      },
+      {
+        title: "Overall Stock",
+        value: latestData.overallStock.toLocaleString(),
+        unit: "MT",
+      },
+    ]
+  : [
+      {
+        title: "Fine Ore Production",
+        value: "No Data Uploaded",
+        unit: "",
+      },
+      {
+        title: "Lump Ore Production",
+        value: "No Data Uploaded",
+        unit: "",
+      },
+      {
+        title: "Overall Production",
+        value: "No Data Uploaded",
+        unit: "",
+      },
+      {
+        title: "Overall Stock",
+        value: "No Data Uploaded",
+        unit: "",
+      },
+    ];
 
   return (
     <div className=" m-1 p-8">

@@ -13,83 +13,218 @@ const PDFReportGenerator = () => {
       return;
     }
 
-    // -----------------------------
-    // Prepare data
-    // -----------------------------
+    // ==================================================
+    // PREPARE DATA
+    // ==================================================
 
-    const productionValues = mineData.map(
-      (item) => Number(item.Production) || 0
-    );
+    const processedData = mineData.map((item) => {
+      const fineOreProduction =
+        Number(item.fineOreProduction) || 0;
 
-    const stockValues = mineData.map(
-      (item) => Number(item.Stock) || 0
-    );
+      const lumpOreProduction =
+        Number(item.lumpOreProduction) || 0;
 
-    const totalProduction = productionValues.reduce(
-      (sum, value) => sum + value,
-      0
-    );
+      const overallProduction =
+        fineOreProduction + lumpOreProduction;
 
-    const averageProduction =
-      totalProduction / mineData.length;
+      const target =
+        Number(item.target) || 0;
 
-    const efficiencyValues = mineData.map((item) => {
-      const production = Number(item.Production) || 0;
-      const target = Number(item.Target) || 0;
+      const dispatch =
+        Number(item.dispatch) || 0;
 
-      return target > 0
-        ? (production / target) * 100
-        : 0;
+      const fineOreStock =
+        Number(item.fineOreStock) || 0;
+
+      const lumpOreStock =
+        Number(item.lumpOreStock) || 0;
+
+      const overallStock =
+        fineOreStock + lumpOreStock;
+
+      const efficiency =
+        target > 0
+          ? (overallProduction / target) * 100
+          : 0;
+
+      return {
+        date: item.date,
+
+        fineOreProduction,
+        lumpOreProduction,
+        overallProduction,
+
+        target,
+        dispatch,
+
+        fineOreStock,
+        lumpOreStock,
+        overallStock,
+
+        efficiency,
+      };
     });
 
-    const averageEfficiency =
-      efficiencyValues.reduce(
-        (sum, value) => sum + value,
+
+    // ==================================================
+    // PRODUCTION CALCULATIONS
+    // ==================================================
+
+    const totalFineOreProduction =
+      processedData.reduce(
+        (sum, item) =>
+          sum + item.fineOreProduction,
         0
-      ) / efficiencyValues.length;
+      );
 
-    const bestDay = mineData.reduce(
-      (best, item) =>
-        Number(item.Production) >
-        Number(best.Production)
-          ? item
-          : best
-    );
+    const totalLumpOreProduction =
+      processedData.reduce(
+        (sum, item) =>
+          sum + item.lumpOreProduction,
+        0
+      );
 
-    const worstDay = mineData.reduce(
-      (worst, item) =>
-        Number(item.Production) <
-        Number(worst.Production)
-          ? item
-          : worst
-    );
+    const totalOverallProduction =
+      totalFineOreProduction +
+      totalLumpOreProduction;
 
-    const currentStock =
-      stockValues[stockValues.length - 1];
 
-    const daysAboveTarget = mineData.filter((item) => {
-      const production = Number(item.Production) || 0;
-      const target = Number(item.Target) || 0;
+    const averageDailyProduction =
+      totalOverallProduction /
+      processedData.length;
 
-      return production >= target;
-    }).length;
+
+    // ==================================================
+    // EFFICIENCY
+    // ==================================================
+
+    const averageEfficiency =
+      processedData.reduce(
+        (sum, item) =>
+          sum + item.efficiency,
+        0
+      ) / processedData.length;
+
+
+    // ==================================================
+    // TARGET ACHIEVEMENT
+    // ==================================================
+
+    const daysAboveTarget =
+      processedData.filter(
+        (item) =>
+          item.overallProduction >= item.target
+      ).length;
+
 
     const targetAchievement =
-      (daysAboveTarget / mineData.length) * 100;
+      processedData.length > 0
+        ? (daysAboveTarget /
+            processedData.length) *
+          100
+        : 0;
 
 
-    // -----------------------------
-    // Create PDF
-    // -----------------------------
+    // ==================================================
+    // BEST / WORST PRODUCTION
+    // ==================================================
+
+    const bestDay =
+      processedData.reduce(
+        (best, item) =>
+          item.overallProduction >
+          best.overallProduction
+            ? item
+            : best,
+        processedData[0]
+      );
+
+
+    const worstDay =
+      processedData.reduce(
+        (worst, item) =>
+          item.overallProduction <
+          worst.overallProduction
+            ? item
+            : worst,
+        processedData[0]
+      );
+
+
+    // ==================================================
+    // STOCK CALCULATIONS
+    // ==================================================
+
+    const currentData =
+      processedData[processedData.length - 1];
+
+
+    const currentFineOreStock =
+      currentData.fineOreStock;
+
+    const currentLumpOreStock =
+      currentData.lumpOreStock;
+
+    const currentOverallStock =
+      currentData.overallStock;
+
+
+    const averageFineOreStock =
+      processedData.reduce(
+        (sum, item) =>
+          sum + item.fineOreStock,
+        0
+      ) / processedData.length;
+
+
+    const averageLumpOreStock =
+      processedData.reduce(
+        (sum, item) =>
+          sum + item.lumpOreStock,
+        0
+      ) / processedData.length;
+
+
+    const averageOverallStock =
+      processedData.reduce(
+        (sum, item) =>
+          sum + item.overallStock,
+        0
+      ) / processedData.length;
+
+
+    const highestOverallStock =
+      Math.max(
+        ...processedData.map(
+          (item) => item.overallStock
+        )
+      );
+
+
+    const lowestOverallStock =
+      Math.min(
+        ...processedData.map(
+          (item) => item.overallStock
+        )
+      );
+
+
+    // ==================================================
+    // CREATE PDF
+    // ==================================================
 
     const doc = new jsPDF();
 
-    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageWidth =
+      doc.internal.pageSize.getWidth();
+
+    const pageHeight =
+      doc.internal.pageSize.getHeight();
 
 
-    // -----------------------------
-    // Header
-    // -----------------------------
+    // ==================================================
+    // HEADER
+    // ==================================================
 
     doc.setFontSize(24);
     doc.setFont("helvetica", "bold");
@@ -104,12 +239,16 @@ const PDFReportGenerator = () => {
     doc.setFont("helvetica", "normal");
 
     doc.text(
-      "Operational Performance Report",
+      "Monthly Operational Performance Report",
       20,
       33
     );
 
-    doc.setDrawColor(80, 100, 130);
+    doc.setDrawColor(
+      80,
+      100,
+      130
+    );
 
     doc.line(
       20,
@@ -119,220 +258,391 @@ const PDFReportGenerator = () => {
     );
 
 
-    // -----------------------------
-    // Report Information
-    // -----------------------------
+    // ==================================================
+    // REPORT INFORMATION
+    // ==================================================
 
-    doc.setFontSize(11);
+    doc.setFontSize(10);
 
     doc.text(
-      `Report Date: ${new Date().toLocaleDateString()}`,
+      `Report Generated: ${new Date().toLocaleDateString()}`,
       20,
       50
     );
 
     doc.text(
-      `Records Analyzed: ${mineData.length}`,
+      `Operational Records Analyzed: ${processedData.length}`,
       20,
       57
     );
 
+    doc.text(
+      "Analysis Period: 30 Days",
+      20,
+      64
+    );
 
-    // -----------------------------
-    // Executive Summary
-    // -----------------------------
+
+    // ==================================================
+    // EXECUTIVE SUMMARY
+    // ==================================================
 
     doc.setFontSize(16);
-    doc.setFont("helvetica", "bold");
+    doc.setFont(
+      "helvetica",
+      "bold"
+    );
 
     doc.text(
       "Executive Summary",
       20,
-      72
+      78
     );
 
-    doc.setFontSize(11);
-    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setFont(
+      "helvetica",
+      "normal"
+    );
+
 
     doc.text(
-      `Total Production: ${totalProduction.toLocaleString()} MT`,
+      `Fine Ore Production: ${totalFineOreProduction.toLocaleString()} MT`,
       25,
-      82
+      88
+    );
+
+    doc.text(
+      `Lump Ore Production: ${totalLumpOreProduction.toLocaleString()} MT`,
+      25,
+      96
+    );
+
+    doc.text(
+      `Overall Production: ${totalOverallProduction.toLocaleString()} MT`,
+      25,
+      104
     );
 
     doc.text(
       `Average Daily Production: ${Math.round(
-        averageProduction
+        averageDailyProduction
       ).toLocaleString()} MT`,
       25,
-      90
+      112
     );
 
     doc.text(
       `Average Efficiency: ${averageEfficiency.toFixed(1)}%`,
       25,
-      98
-    );
-
-    doc.text(
-      `Current Stock: ${currentStock.toLocaleString()} MT`,
-      25,
-      106
+      120
     );
 
     doc.text(
       `Target Achievement: ${targetAchievement.toFixed(0)}%`,
       25,
-      114
+      128
     );
 
 
-    // -----------------------------
-    // Performance Analysis
-    // -----------------------------
+    // ==================================================
+    // STOCK SUMMARY
+    // ==================================================
 
     doc.setFontSize(16);
-    doc.setFont("helvetica", "bold");
+    doc.setFont(
+      "helvetica",
+      "bold"
+    );
+
+    doc.text(
+      "Stock Summary",
+      20,
+      145
+    );
+
+    doc.setFontSize(10);
+    doc.setFont(
+      "helvetica",
+      "normal"
+    );
+
+    doc.text(
+      `Current Fine Ore Stock: ${currentFineOreStock.toLocaleString()} MT`,
+      25,
+      155
+    );
+
+    doc.text(
+      `Current Lump Ore Stock: ${currentLumpOreStock.toLocaleString()} MT`,
+      25,
+      163
+    );
+
+    doc.text(
+      `Current Overall Stock: ${currentOverallStock.toLocaleString()} MT`,
+      25,
+      171
+    );
+
+    doc.text(
+      `Average Fine Ore Stock: ${Math.round(
+        averageFineOreStock
+      ).toLocaleString()} MT`,
+      25,
+      179
+    );
+
+    doc.text(
+      `Average Lump Ore Stock: ${Math.round(
+        averageLumpOreStock
+      ).toLocaleString()} MT`,
+      25,
+      187
+    );
+
+    doc.text(
+      `Average Overall Stock: ${Math.round(
+        averageOverallStock
+      ).toLocaleString()} MT`,
+      25,
+      195
+    );
+
+
+    // ==================================================
+    // PERFORMANCE ANALYSIS
+    // ==================================================
+
+    doc.addPage();
+
+    doc.setFontSize(16);
+    doc.setFont(
+      "helvetica",
+      "bold"
+    );
 
     doc.text(
       "Performance Analysis",
       20,
-      132
+      25
     );
 
-    doc.setFontSize(11);
-    doc.setFont("helvetica", "normal");
-
-    doc.text(
-      `Best Production Day: ${bestDay.Date} (${Number(
-        bestDay.Production
-      ).toLocaleString()} MT)`,
-      25,
-      142
+    doc.setFontSize(10);
+    doc.setFont(
+      "helvetica",
+      "normal"
     );
 
     doc.text(
-      `Lowest Production Day: ${worstDay.Date} (${Number(
-        worstDay.Production
-      ).toLocaleString()} MT)`,
+      `Best Production Day: ${bestDay.date} (${bestDay.overallProduction.toLocaleString()} MT)`,
       25,
-      150
+      37
     );
 
     doc.text(
-      `Days Meeting Target: ${daysAboveTarget} of ${mineData.length}`,
+      `Lowest Production Day: ${worstDay.date} (${worstDay.overallProduction.toLocaleString()} MT)`,
       25,
-      158
+      45
+    );
+
+    doc.text(
+      `Days Meeting Target: ${daysAboveTarget} of ${processedData.length}`,
+      25,
+      53
+    );
+
+    doc.text(
+      `Highest Overall Stock: ${highestOverallStock.toLocaleString()} MT`,
+      25,
+      61
+    );
+
+    doc.text(
+      `Lowest Overall Stock: ${lowestOverallStock.toLocaleString()} MT`,
+      25,
+      69
     );
 
 
-    // -----------------------------
-    // Daily Production Table
-    // -----------------------------
+    // ==================================================
+    // PRODUCTION TABLE
+    // ==================================================
 
     doc.setFontSize(16);
-    doc.setFont("helvetica", "bold");
-
-    doc.text(
-      "Daily Production",
-      20,
-      178
+    doc.setFont(
+      "helvetica",
+      "bold"
     );
 
-    const tableData = mineData.map((item) => {
-      const production =
-        Number(item.Production) || 0;
+    doc.text(
+      "30-Day Production Analysis",
+      20,
+      85
+    );
 
-      const target =
-        Number(item.Target) || 0;
 
-      const efficiency =
-        target > 0
-          ? ((production / target) * 100).toFixed(1)
-          : "N/A";
+    const productionTableData =
+      processedData.map(
+        (item) => [
+          item.date,
 
-      return [
-        item.Date,
-        `${production.toLocaleString()} MT`,
-        `${target.toLocaleString()} MT`,
-        `${efficiency}%`,
-      ];
-    });
+          `${item.fineOreProduction.toLocaleString()} MT`,
+
+          `${item.lumpOreProduction.toLocaleString()} MT`,
+
+          `${item.overallProduction.toLocaleString()} MT`,
+
+          `${item.target.toLocaleString()} MT`,
+
+          `${item.efficiency.toFixed(1)}%`,
+        ]
+      );
+
 
     autoTable(doc, {
-      startY: 184,
+
+      startY: 91,
 
       head: [
         [
-          "Day",
-          "Production",
+          "Date",
+          "Fine Ore",
+          "Lump Ore",
+          "Overall",
           "Target",
           "Efficiency",
         ],
       ],
 
-      body: tableData,
+      body: productionTableData,
 
       theme: "grid",
 
       styles: {
-        fontSize: 9,
-        cellPadding: 4,
+        fontSize: 7.5,
+        cellPadding: 3,
       },
 
       headStyles: {
-        fillColor: [30, 45, 70],
+        fillColor: [
+          30,
+          45,
+          70,
+        ],
         textColor: 255,
+        fontStyle: "bold",
+      },
+
+      alternateRowStyles: {
+        fillColor: [
+          245,
+          247,
+          250,
+        ],
       },
     });
 
 
-    // -----------------------------
-    // Stock History
-    // -----------------------------
+    // ==================================================
+    // STOCK TABLE
+    // ==================================================
 
     const stockTableStart =
       doc.lastAutoTable.finalY + 15;
 
-    doc.setFontSize(16);
-    doc.setFont("helvetica", "bold");
 
-    doc.text(
-      "Stock History",
-      20,
-      stockTableStart
-    );
+    // If table is too close to footer,
+    // start stock section on a new page.
 
-    const stockTableData = mineData.map(
-      (item, index) => {
-        const stock =
-          Number(item.Stock) || 0;
+    if (
+      stockTableStart >
+      pageHeight - 50
+    ) {
+      doc.addPage();
+      doc.setFontSize(16);
+      doc.setFont(
+        "helvetica",
+        "bold"
+      );
 
-        const previousStock =
-          index > 0
-            ? Number(mineData[index - 1].Stock) || 0
-            : stock;
+      doc.text(
+        "30-Day Stock Analysis",
+        20,
+        25
+      );
+    } else {
 
-        const change =
-          stock - previousStock;
+      doc.setFontSize(16);
+      doc.setFont(
+        "helvetica",
+        "bold"
+      );
 
-        return [
-          item.Date,
-          `${stock.toLocaleString()} MT`,
-          index === 0
-            ? "—"
-            : `${change > 0 ? "+" : ""}${change.toLocaleString()} MT`,
-        ];
-      }
-    );
+      doc.text(
+        "30-Day Stock Analysis",
+        20,
+        stockTableStart
+      );
+    }
+
+
+    const actualStockStart =
+      stockTableStart >
+      pageHeight - 50
+        ? 31
+        : stockTableStart + 6;
+
+
+    const stockTableData =
+      processedData.map(
+        (item, index) => {
+
+          const previousStock =
+            index > 0
+              ? processedData[
+                  index - 1
+                ].overallStock
+              : item.overallStock;
+
+
+          const change =
+            item.overallStock -
+            previousStock;
+
+
+          return [
+
+            item.date,
+
+            `${item.fineOreStock.toLocaleString()} MT`,
+
+            `${item.lumpOreStock.toLocaleString()} MT`,
+
+            `${item.overallStock.toLocaleString()} MT`,
+
+            index === 0
+              ? "—"
+              : `${
+                  change > 0
+                    ? "+"
+                    : ""
+                }${change.toLocaleString()} MT`,
+          ];
+        }
+      );
+
 
     autoTable(doc, {
-      startY: stockTableStart + 6,
+
+      startY: actualStockStart,
 
       head: [
         [
-          "Day",
-          "Available Stock",
+          "Date",
+          "Fine Ore Stock",
+          "Lump Ore Stock",
+          "Overall Stock",
           "Change",
         ],
       ],
@@ -342,48 +652,74 @@ const PDFReportGenerator = () => {
       theme: "grid",
 
       styles: {
-        fontSize: 9,
-        cellPadding: 4,
+        fontSize: 7.5,
+        cellPadding: 3,
       },
 
       headStyles: {
-        fillColor: [30, 45, 70],
+        fillColor: [
+          30,
+          45,
+          70,
+        ],
         textColor: 255,
+        fontStyle: "bold",
+      },
+
+      alternateRowStyles: {
+        fillColor: [
+          245,
+          247,
+          250,
+        ],
       },
     });
 
 
-    // -----------------------------
-    // Footer
-    // -----------------------------
+    // ==================================================
+    // FOOTER
+    // ==================================================
 
     const pageCount =
       doc.internal.getNumberOfPages();
+
 
     for (
       let page = 1;
       page <= pageCount;
       page++
     ) {
+
       doc.setPage(page);
 
-      doc.setFontSize(9);
-      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8);
+
+      doc.setFont(
+        "helvetica",
+        "normal"
+      );
+
+      doc.setTextColor(
+        100,
+        100,
+        100
+      );
 
       doc.text(
         `MineOps Operational Report • Page ${page} of ${pageCount}`,
         20,
-        doc.internal.pageSize.getHeight() - 10
+        pageHeight - 10
       );
+
     }
 
 
-    // -----------------------------
-    // Download PDF
-    // -----------------------------
+    // ==================================================
+    // DOWNLOAD
+    // ==================================================
 
     doc.save(
-      "MineOps_Operational_Report.pdf"
+      "MineOps_30_Day_Operational_Report.pdf"
     );
   };
 
@@ -391,7 +727,10 @@ const PDFReportGenerator = () => {
   return (
     <button
       onClick={generateReport}
-      disabled={!mineData || mineData.length === 0}
+      disabled={
+        !mineData ||
+        mineData.length === 0
+      }
       className="bg-blue-500 hover:bg-blue-600 disabled:bg-slate-600 disabled:cursor-not-allowed text-white font-semibold px-6 py-3 rounded-xl transition"
     >
       Generate PDF Report

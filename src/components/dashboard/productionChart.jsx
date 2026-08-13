@@ -1,4 +1,5 @@
 import React from "react";
+
 import {
   ResponsiveContainer,
   LineChart,
@@ -6,6 +7,7 @@ import {
   XAxis,
   YAxis,
   Tooltip,
+  Legend,
 } from "recharts";
 
 import { useMineData } from "../../context/MineDataContext.jsx";
@@ -15,8 +17,10 @@ const ProductionChart = () => {
 
   const chartData = mineData
     ? mineData.map((item) => ({
-        day: item.Date?.slice(0, 3),
-        production: Number(item.Production),
+        date: item.date,
+        fineOre: item.fineOreProduction,
+        lumpOre: item.lumpOreProduction,
+        overall: item.overallProduction,
       }))
     : [];
 
@@ -24,7 +28,7 @@ const ProductionChart = () => {
     <div className="bg-[#172236] border border-[#2A3B57] rounded-2xl p-6">
 
       <h2 className="text-xl font-semibold mb-6 text-white">
-        Production Trend
+        Monthly Production Trend
       </h2>
 
       <div className="h-80 w-full">
@@ -36,16 +40,16 @@ const ProductionChart = () => {
             <LineChart data={chartData}>
 
               <XAxis
-                dataKey="day"
+                dataKey="date"
                 axisLine={{ stroke: "#FFFFFF", strokeWidth: 1 }}
                 tickLine={false}
-                tick={{ fill: "#E2E8F0", fontSize: 16 }}
+                tick={{ fill: "#E2E8F0", fontSize: 12 }}
               />
 
               <YAxis
                 axisLine={{ stroke: "#FFFFFF", strokeWidth: 1 }}
                 tickLine={false}
-                tick={{ fill: "#E2E8F0", fontSize: 16 }}
+                tick={{ fill: "#E2E8F0", fontSize: 14 }}
               />
 
               <Tooltip
@@ -56,12 +60,39 @@ const ProductionChart = () => {
                 }}
               />
 
+              <Legend />
+
+              {/* Fine Ore */}
+
               <Line
                 type="monotone"
-                dataKey="production"
+                dataKey="fineOre"
+                name="Fine Ore"
                 stroke="#60A5FA"
-                strokeWidth={4}
-                dot={{ r: 5, fill: "#60A5FA" }}
+                strokeWidth={3}
+                dot={false}
+              />
+
+              {/* Lump Ore */}
+
+              <Line
+                type="monotone"
+                dataKey="lumpOre"
+                name="Lump Ore"
+                stroke="#A78BFA"
+                strokeWidth={3}
+                dot={false}
+              />
+
+              {/* Overall */}
+
+              <Line
+                type="monotone"
+                dataKey="overall"
+                name="Overall Production"
+                stroke="#22C55E"
+                strokeWidth={3}
+                dot={false}
               />
 
             </LineChart>

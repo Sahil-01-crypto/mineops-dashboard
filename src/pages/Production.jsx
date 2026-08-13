@@ -8,88 +8,184 @@ const Production = () => {
   if (!mineData || mineData.length === 0) {
     return (
       <div className="m-1 p-8">
+
         {/* Header */}
+
         <div className="mb-8">
+
           <h1 className="text-3xl font-bold text-white">
             Production
           </h1>
 
           <p className="text-slate-400 mt-2">
-            Monitor daily ore production and operational efficiency.
+            Monitor monthly fine ore, lump ore and overall production.
           </p>
+
         </div>
 
         {/* Empty State */}
+
         <div className="bg-[#172236] border border-[#2A3B57] rounded-2xl p-10 text-center">
+
           <h2 className="text-xl font-semibold text-white">
             No Production Data
           </h2>
 
           <p className="text-slate-400 mt-2">
             Upload an Excel or CSV file from the Dashboard to view
-            production data.
+            monthly production data.
           </p>
+
         </div>
+
       </div>
     );
   }
 
-  // Convert Excel values into numbers
-  const productionValues = mineData.map(
-    (item) => Number(item.Production) || 0
-  );
+  // --------------------------------------------------
+  // PRODUCTION VALUES
+  // --------------------------------------------------
 
-  const targetValues = mineData.map(
-    (item) => Number(item.Target) || 0
-  );
-
-  // Weekly production
-  const weeklyProduction = productionValues.reduce(
-    (sum, value) => sum + value,
+  const fineOreProduction = mineData.reduce(
+    (sum, item) =>
+      sum + (Number(item.fineOreProduction) || 0),
     0
   );
 
-  // Average daily production
-  const averageProduction =
-    weeklyProduction / mineData.length;
+  const lumpOreProduction = mineData.reduce(
+    (sum, item) =>
+      sum + (Number(item.lumpOreProduction) || 0),
+    0
+  );
 
-  // Calculate efficiency for every day
+  // Overall production
+  const overallProduction =
+    fineOreProduction + lumpOreProduction;
+
+
+  // --------------------------------------------------
+  // AVERAGE DAILY PRODUCTION
+  // --------------------------------------------------
+
+  const averageProduction =
+    overallProduction / mineData.length;
+
+
+  // --------------------------------------------------
+  // EFFICIENCY
+  // --------------------------------------------------
+
   const efficiencyValues = mineData.map((item) => {
-    const production = Number(item.Production) || 0;
-    const target = Number(item.Target) || 0;
+
+    const production =
+      Number(item.overallProduction) || 0;
+
+    const target =
+      Number(item.target) || 0;
 
     return target > 0
       ? (production / target) * 100
       : 0;
+
   });
 
-  // Average efficiency
+
   const averageEfficiency =
     efficiencyValues.reduce(
       (sum, value) => sum + value,
       0
     ) / efficiencyValues.length;
 
-  // Format table data
+
+  // --------------------------------------------------
+  // TARGET ACHIEVEMENT
+  // --------------------------------------------------
+
+  const targetAchievementDays =
+    mineData.filter((item) => {
+
+      const production =
+        Number(item.overallProduction) || 0;
+
+      const target =
+        Number(item.target) || 0;
+
+      return production >= target;
+
+    }).length;
+
+
+  const targetAchievement =
+    mineData.length > 0
+      ? (targetAchievementDays / mineData.length) * 100
+      : 0;
+
+
+  // --------------------------------------------------
+  // DAILY PRODUCTION TABLE
+  // --------------------------------------------------
+
   const dailyProduction = mineData.map((item) => {
-    const production = Number(item.Production) || 0;
-    const target = Number(item.Target) || 0;
+
+    const fineOre =
+      Number(item.fineOreProduction) || 0;
+
+    const lumpOre =
+      Number(item.lumpOreProduction) || 0;
+
+    const overall =
+      fineOre + lumpOre;
+
+    const target =
+      Number(item.target) || 0;
 
     const efficiency =
       target > 0
-        ? Math.round((production / target) * 100)
+        ? Math.round((overall / target) * 100)
         : 0;
 
     return {
-      date: item.Date,
-      production,
+      date: item.date,
+      fineOre,
+      lumpOre,
+      overall,
       target,
       efficiency,
     };
+
   });
 
+
+  // --------------------------------------------------
+  // HIGHEST PRODUCTION DAY
+  // --------------------------------------------------
+
+  const highestProductionDay =
+    dailyProduction.reduce(
+      (highest, current) =>
+        current.overall > highest.overall
+          ? current
+          : highest,
+      dailyProduction[0]
+    );
+
+
+  // --------------------------------------------------
+  // LOWEST PRODUCTION DAY
+  // --------------------------------------------------
+
+  const lowestProductionDay =
+    dailyProduction.reduce(
+      (lowest, current) =>
+        current.overall < lowest.overall
+          ? current
+          : lowest,
+      dailyProduction[0]
+    );
+
+
   return (
-    <div className=" m-1 p-8">
+    <div className="m-1 p-8">
 
       {/* Header */}
 
@@ -100,49 +196,77 @@ const Production = () => {
         </h1>
 
         <p className="text-slate-400 mt-2">
-          Monitor daily ore production and operational efficiency.
+          Monitor monthly fine ore, lump ore and overall production.
         </p>
 
       </div>
 
 
-      {/* Summary Cards */}
+      {/* --------------------------------------------- */}
+      {/* SUMMARY CARDS */}
+      {/* --------------------------------------------- */}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-
-        {/* Weekly Production */}
-
-        <div className="bg-[#172236] border border-[#2A3B57] rounded-2xl p-6">
-
-          <p className="text-sm text-slate-400">
-            Weekly Production
-          </p>
-
-          <h2 className="text-3xl font-bold mt-3 text-white">
-            {weeklyProduction.toLocaleString()} MT
-          </h2>
-
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
 
 
-        {/* Average Daily Production */}
+        {/* Fine Ore */}
 
         <div className="bg-[#172236] border border-[#2A3B57] rounded-2xl p-6">
 
           <p className="text-sm text-slate-400">
-            Average Daily Production
+            Fine Ore Production
           </p>
 
-          <h2 className="text-3xl font-bold mt-3 text-white">
-            {Math.round(
-              averageProduction
-            ).toLocaleString()} MT
+          <h2 className="text-3xl font-bold mt-3 text-blue-400">
+            {fineOreProduction.toLocaleString()} MT
           </h2>
+
+          <p className="text-xs text-slate-500 mt-2">
+            Total for 30 days
+          </p>
 
         </div>
 
 
-        {/* Average Efficiency */}
+        {/* Lump Ore */}
+
+        <div className="bg-[#172236] border border-[#2A3B57] rounded-2xl p-6">
+
+          <p className="text-sm text-slate-400">
+            Lump Ore Production
+          </p>
+
+          <h2 className="text-3xl font-bold mt-3 text-purple-400">
+            {lumpOreProduction.toLocaleString()} MT
+          </h2>
+
+          <p className="text-xs text-slate-500 mt-2">
+            Total for 30 days
+          </p>
+
+        </div>
+
+
+        {/* Overall */}
+
+        <div className="bg-[#172236] border border-[#2A3B57] rounded-2xl p-6">
+
+          <p className="text-sm text-slate-400">
+            Overall Production
+          </p>
+
+          <h2 className="text-3xl font-bold mt-3 text-white">
+            {overallProduction.toLocaleString()} MT
+          </h2>
+
+          <p className="text-xs text-slate-500 mt-2">
+            Fine Ore + Lump Ore
+          </p>
+
+        </div>
+
+
+        {/* Efficiency */}
 
         <div className="bg-[#172236] border border-[#2A3B57] rounded-2xl p-6">
 
@@ -154,20 +278,94 @@ const Production = () => {
             {averageEfficiency.toFixed(1)}%
           </h2>
 
+          <p className="text-xs text-slate-500 mt-2">
+            Monthly average
+          </p>
+
         </div>
 
       </div>
 
 
-      {/* Production Table */}
+      {/* --------------------------------------------- */}
+      {/* SECONDARY SUMMARY */}
+      {/* --------------------------------------------- */}
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+
+
+        {/* Average Daily Production */}
+
+        <div className="bg-[#172236] border border-[#2A3B57] rounded-2xl p-6">
+
+          <p className="text-sm text-slate-400">
+            Average Daily Production
+          </p>
+
+          <h2 className="text-2xl font-bold mt-3 text-white">
+            {Math.round(
+              averageProduction
+            ).toLocaleString()} MT
+          </h2>
+
+        </div>
+
+
+        {/* Target Achievement */}
+
+        <div className="bg-[#172236] border border-[#2A3B57] rounded-2xl p-6">
+
+          <p className="text-sm text-slate-400">
+            Target Achievement
+          </p>
+
+          <h2 className="text-2xl font-bold mt-3 text-green-400">
+            {targetAchievement.toFixed(1)}%
+          </h2>
+
+          <p className="text-xs text-slate-500 mt-2">
+            Days meeting production target
+          </p>
+
+        </div>
+
+
+        {/* Highest Production Day */}
+
+        <div className="bg-[#172236] border border-[#2A3B57] rounded-2xl p-6">
+
+          <p className="text-sm text-slate-400">
+            Highest Production Day
+          </p>
+
+          <h2 className="text-2xl font-bold mt-3 text-white">
+            {highestProductionDay.date}
+          </h2>
+
+          <p className="text-xs text-slate-500 mt-2">
+            {highestProductionDay.overall.toLocaleString()} MT
+          </p>
+
+        </div>
+
+      </div>
+
+
+      {/* --------------------------------------------- */}
+      {/* PRODUCTION TABLE */}
+      {/* --------------------------------------------- */}
 
       <div className="bg-[#172236] border border-[#2A3B57] rounded-2xl overflow-hidden">
 
         <div className="p-6 border-b border-[#2A3B57]">
 
           <h2 className="text-xl font-semibold text-white">
-            Daily Production
+            30-Day Production Analysis
           </h2>
+
+          <p className="text-sm text-slate-400 mt-1">
+            Daily fine ore, lump ore and overall production performance.
+          </p>
 
         </div>
 
@@ -181,11 +379,19 @@ const Production = () => {
               <tr>
 
                 <th className="text-left px-6 py-4 text-sm text-slate-400">
-                  Day
+                  Date
                 </th>
 
                 <th className="text-left px-6 py-4 text-sm text-slate-400">
-                  Production
+                  Fine Ore
+                </th>
+
+                <th className="text-left px-6 py-4 text-sm text-slate-400">
+                  Lump Ore
+                </th>
+
+                <th className="text-left px-6 py-4 text-sm text-slate-400">
+                  Overall
                 </th>
 
                 <th className="text-left px-6 py-4 text-sm text-slate-400">
@@ -210,22 +416,52 @@ const Production = () => {
                   className="border-t border-[#2A3B57] hover:bg-[#1B2A40]"
                 >
 
+                  {/* Date */}
+
                   <td className="px-6 py-4 text-white">
                     {item.date}
                   </td>
 
 
-                  <td className="px-6 py-4 font-semibold text-white">
-                    {item.production.toLocaleString()} MT
+                  {/* Fine Ore */}
+
+                  <td className="px-6 py-4 font-semibold text-blue-400">
+                    {item.fineOre.toLocaleString()} MT
                   </td>
 
+
+                  {/* Lump Ore */}
+
+                  <td className="px-6 py-4 font-semibold text-purple-400">
+                    {item.lumpOre.toLocaleString()} MT
+                  </td>
+
+
+                  {/* Overall */}
+
+                  <td className="px-6 py-4 font-semibold text-white">
+                    {item.overall.toLocaleString()} MT
+                  </td>
+
+
+                  {/* Target */}
 
                   <td className="px-6 py-4 text-slate-400">
                     {item.target.toLocaleString()} MT
                   </td>
 
 
-                  <td className="px-6 py-4 text-blue-400 font-semibold">
+                  {/* Efficiency */}
+
+                  <td
+                    className={`px-6 py-4 font-semibold ${
+                      item.efficiency >= 100
+                        ? "text-green-400"
+                        : item.efficiency >= 90
+                        ? "text-yellow-400"
+                        : "text-red-400"
+                    }`}
+                  >
                     {item.efficiency}%
                   </td>
 
@@ -236,6 +472,55 @@ const Production = () => {
             </tbody>
 
           </table>
+
+        </div>
+
+      </div>
+
+
+      {/* --------------------------------------------- */}
+      {/* PRODUCTION INSIGHTS */}
+      {/* --------------------------------------------- */}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+
+
+        {/* Highest */}
+
+        <div className="bg-[#172236] border border-[#2A3B57] rounded-2xl p-6">
+
+          <p className="text-green-400 font-semibold">
+            ↑ Highest Production
+          </p>
+
+          <p className="text-white text-lg font-semibold mt-2">
+            {highestProductionDay.date}
+          </p>
+
+          <p className="text-slate-400 text-sm mt-1">
+            Overall production reached{" "}
+            {highestProductionDay.overall.toLocaleString()} MT.
+          </p>
+
+        </div>
+
+
+        {/* Lowest */}
+
+        <div className="bg-[#172236] border border-[#2A3B57] rounded-2xl p-6">
+
+          <p className="text-yellow-400 font-semibold">
+            ↓ Lowest Production
+          </p>
+
+          <p className="text-white text-lg font-semibold mt-2">
+            {lowestProductionDay.date}
+          </p>
+
+          <p className="text-slate-400 text-sm mt-1">
+            Overall production was{" "}
+            {lowestProductionDay.overall.toLocaleString()} MT.
+          </p>
 
         </div>
 
