@@ -2,9 +2,11 @@
 
 ### Mining Operations Intelligence Dashboard
 
-MineOps is a web-based mining operations analytics platform that transforms operational data from Excel/CSV files into an interactive dashboard for monitoring production, stock, efficiency, and operational performance.
+MineOps is a web-based mining operations analytics platform that transforms structured operational data from Excel/CSV files into an interactive dashboard for monitoring production, stock, efficiency, and operational performance.
 
-The application allows users to upload operational data once and automatically analyzes the dataset across multiple sections including Dashboard, Production, Stock, and Analytics.
+The application allows users to upload operational data once and automatically analyzes the dataset across multiple sections including **Dashboard, Production, Stock, and Analytics**.
+
+The current version is designed around a **30-day operational dataset** and distinguishes between **Fine Ore, Lump Ore, and Overall Production/Stock** to provide a more detailed view of mining operations.
 
 ---
 
@@ -12,16 +14,27 @@ The application allows users to upload operational data once and automatically a
 
 ### 📊 Interactive Dashboard
 
-Get a high-level overview of mining operations including:
+The MineOps Dashboard provides a high-level overview of the uploaded mining dataset.
 
-- Today's Production
+It includes:
+
+- Fine Ore Production
+- Lump Ore Production
+- Overall Production
+- Overall Stock
 - Today's Dispatch
-- Available Stock
-- Active Equipment
-- Production Trend
+- 30-Day Production Trend
 - Daily Operational Summary
 
-All dashboard metrics are generated from the uploaded operational dataset.
+All dashboard metrics are calculated dynamically from the uploaded operational dataset.
+
+The production trend allows users to compare:
+
+- Fine Ore
+- Lump Ore
+- Overall Production
+
+The dashboard does not display arbitrary operational values when no dataset has been uploaded.
 
 ---
 
@@ -29,10 +42,12 @@ All dashboard metrics are generated from the uploaded operational dataset.
 
 MineOps allows users to upload operational data directly through the application.
 
-The uploaded dataset is processed and stored centrally so that all sections of the application can use the same data.
+The uploaded dataset is processed on the client side and stored centrally so that all sections of the application can use the same data.
 
 ```text
 Excel / CSV
+     ↓
+ExcelUploader
      ↓
 Data Processing
      ↓
@@ -44,277 +59,73 @@ Stock
 Analytics
 ```
 
----
-
-### 🏭 Production Monitoring
-
-The Production section provides:
-
-- Total production
-- Average daily production
-- Production efficiency
-- Daily production table
-- Target vs actual production
-- Daily performance analysis
-
-Production metrics are calculated dynamically from the uploaded dataset.
-
----
-
-### 📦 Stock Monitoring
-
-The Stock section provides:
-
-- Current stock
-- Highest recorded stock
-- Average stock
-- Stock history
-- Daily stock changes
-- Stock increase/decrease status
-
-Stock metrics are calculated dynamically from the uploaded dataset.
-
----
-
-### 📈 Analytics
-
-The Analytics section provides:
-
-- Average production
-- Average efficiency
-- Best production day
-- Lowest production day
-- Production vs target visualization
-- Efficiency trend
-- Target achievement
-- Operational insights
-
-All analytics are generated dynamically from the uploaded operational dataset.
-
----
-
-### 📄 PDF Report Generation
-
-MineOps can generate a downloadable operational report containing:
-
-- Executive summary
-- Total production
-- Average daily production
-- Average efficiency
-- Current stock
-- Target achievement
-- Best production day
-- Lowest production day
-- Daily production table
-- Stock history
-
-```text
-Operational Data
-       ↓
-     MineOps
-       ↓
-   Data Analysis
-       ↓
-  PDF Report
+###🔄 Application Workflow
 ```
-
----
-
-### 🔎 Data Search
-
-The navigation search allows users to search across uploaded operational records.
-
-Search can be performed using values such as:
-
-- Date
-- Production
-- Target
-- Dispatch
-- Stock
-
-Search results are displayed directly from the uploaded dataset.
-
----
-
-## 🧠 Architecture
-
-MineOps follows a centralized data architecture.
-
-Instead of each page maintaining its own copy of the uploaded data, the application uses React Context to maintain a shared dataset.
-
-```text
-                    Excel / CSV
-                         │
-                         ▼
-                  ExcelUploader
-                         │
-                         ▼
-                MineDataContext
-                         │
-          ┌──────────────┼──────────────┐
-          │              │              │
-          ▼              ▼              ▼
-      Dashboard      Production       Stock
-          │              │              │
-          └──────────────┼──────────────┘
-                         ▼
-                     Analytics
-                         │
-                         ▼
-                    PDF Report
-```
-
-This architecture allows a single uploaded dataset to be shared across the entire application, ensuring that Dashboard, Production, Stock, Analytics, Search, and PDF reporting operate on the same source of data.
-
----
-
-## 🛠️ Tech Stack
-
-### Frontend
-
-- React
-- JavaScript
-- Tailwind CSS
-- Recharts
-- React Icons
-
-### Data Processing
-
-- XLSX
-
-### Reporting
-
-- jsPDF
-- jsPDF AutoTable
-
-### Development & Version Control
-
-- Vite
-- Git
-- GitHub
-
----
-
-## 📂 Project Structure
-
-```text
-src/
-│
-├── components/
-│   ├── dashboard/
-│   │   ├── KPICard.jsx
-│   │   ├── productionChart.jsx
-│   │   └── OperationsSummary.jsx
-│   │
-│   ├── data/
-│   │   └── ExcelUploader.jsx
-│   │
-│   ├── layout/
-│   │   ├── Navbar.jsx
-│   │   └── Sidebar.jsx
-│   │
-│   └── reports/
-│       └── PDFReportGenerator.jsx
-│
-├── context/
-│   └── MineDataContext.jsx
-│
-├── pages/
-│   ├── Dashboard.jsx
-│   ├── Production.jsx
-│   ├── Stock.jsx
-│   └── Analytics.jsx
-│
-├── data/
-│
-├── App.jsx
-└── main.jsx
-```
-
----
-
-## 📋 Expected Data Format
-
-MineOps works with operational datasets containing fields such as:
-
-| Field | Description |
-|---|---|
-| Date | Operational date |
-| Production | Daily production in MT |
-| Target | Daily production target |
-| Dispatch | Daily dispatch quantity |
-| Stock | Available stock in MT |
-
-### Example
-
-| Date | Production | Target | Dispatch | Stock |
-|---|---:|---:|---:|---:|
-| Monday | 11200 | 12000 | 10500 | 48000 |
-| Tuesday | 12450 | 12000 | 10920 | 48650 |
-| Wednesday | 11800 | 12500 | 10700 | 47500 |
-| Thursday | 13200 | 12500 | 11500 | 49200 |
-
-The application calculates performance metrics from these values.
-
----
-
-
-## 🔄 Application Workflow
-
-```text
 1. Open MineOps
         ↓
 2. Upload Excel / CSV
         ↓
-3. MineOps processes the data
+3. ExcelUploader processes the dataset
         ↓
-4. Dashboard updates
+4. Data is stored in MineDataContext
         ↓
-5. Production analysis
+5. Dashboard displays operational overview
         ↓
-6. Stock analysis
+6. Production analyzes Fine + Lump + Overall Production
         ↓
-7. Advanced analytics
+7. Stock analyzes Fine + Lump + Overall Stock
         ↓
-8. Search operational records
+8. Analytics generates performance visualizations
         ↓
-9. Generate PDF report
+9. Search provides quick navigation
+        ↓
+10. PDF Report generates an operational summary
 ```
 
----
+# 📋 Expected Data Format
 
-## 🎯 Project Goals
+MineOps is designed to process a **30-day operational dataset** containing
+production, stock, target, and dispatch information.
 
-MineOps was designed to demonstrate how operational datasets can be transformed into a usable decision-support interface.
+The dataset separates the two major production outputs:
 
-The primary goals are:
+- Fine Ore
+- Lump Ore
 
-- Centralized operational data handling
-- Automated metric calculation
-- Interactive data visualization
-- Production monitoring
-- Stock monitoring
-- Operational performance analysis
-- Automated report generation
+The application then calculates or uses the corresponding overall values.
 
 ---
 
-## 📌 Current Version
+## 📊 Example Operational Dataset
 
-**MineOps V1**
+The Excel file can follow a structure like this:
 
-The current version focuses on:
+| Date | Fine Ore Production | Lump Ore Production | Overall Production | Target | Dispatch | Fine Ore Stock | Lump Ore Stock | Overall Stock |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| 01-08-2026 | 5,900 | 3,750 | 9,650 | 12,000 | 9,000 | 24,000 | 17,350 | 41,350 |
+| 02-08-2026 | 6,300 | 4,000 | 10,300 | 12,000 | 9,500 | 24,750 | 17,900 | 42,650 |
+| 03-08-2026 | 5,600 | 3,600 | 9,200 | 11,500 | 8,700 | 24,200 | 17,500 | 41,700 |
+| 04-08-2026 | 6,850 | 4,350 | 11,200 | 12,500 | 10,200 | 24,950 | 18,100 | 43,050 |
+| 05-08-2026 | 5,500 | 3,550 | 9,050 | 12,000 | 8,800 | 24,150 | 17,500 | 41,650 |
+| 06-08-2026 | 5,900 | 3,700 | 9,600 | 12,000 | 9,100 | 23,900 | 17,350 | 41,250 |
+| 07-08-2026 | 6,200 | 4,000 | 10,200 | 12,500 | 9,600 | 24,300 | 17,800 | 42,100 |
 
-- Excel/CSV data ingestion
-- Shared application data state
-- Production monitoring
-- Stock monitoring
-- Analytics
-- Search
-- PDF reporting
-
+> **Note:** The above values are example/demo data intended to demonstrate
+> the expected structure of the MineOps dataset.
 
 ---
+
+## 🧮 Data Relationships
+
+MineOps uses the following operational relationships:
+
+### Overall Production
+
+```text
+Overall Production
+=
+Fine Ore Production + Lump Ore Production
+```
 
 ## ⭐ Future Vision
 
